@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">    
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Filmek</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>
+    <link href="css/main.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container"><canvas id="chart" width="400" height="400"></canvas></div>
+    <script>
+        let attilka = <%= history.reduce((acc, curr) => acc + (curr.addedBy == "attilka" ? 1 : 0), 0) %>;
+        let csengo = <%= history.reduce((acc, curr) => acc + (curr.addedBy == "csengő" ? 1 : 0), 0) %>;
+        let other = <%= history.length %> - attilka - csengo;
+        const chart = new Chart("chart", {
+            type: 'pie',
+            data: {
+                labels: ["attilka", "csengő", "-"],
+                datasets: [{
+                    //label: "My First dataset",
+                    backgroundColor: [
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 99, 132)',
+                        'rgb(153, 102, 255)',
+                        //orange: 'rgb(255, 159, 64)',
+                        //yellow: 'rgb(255, 205, 86)',
+                        //green: 'rgb(75, 192, 192)',
+                        //grey: 'rgb(201, 203, 207)'
+                    ],
+                    //borderColor: 'rgb(255, 99, 132)',
+                    data: [attilka, csengo, other],
+                }]
+            }
+        });
+    </script>
+</body>
+</html>

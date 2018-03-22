@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">    
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Filmek</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <link href="css/main.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Cím</th>
+                    <th scope="col" id="addedBy">Hozzáadta <img id="info" src="/img/info.svg" alt="info" data-tooltip="tooltip" data-html="true"></th>
+                    <th scope="col" id="actions"><img id="random" src="/img/random.svg" alt="random" data-toggle="modal" data-tooltip="tooltip" title="Sorsolás" data-target="#resultModal"><img src="/img/plus.svg" alt="plus" data-toggle="modal" data-target="#addMovieModal" data-tooltip="tooltip" title="Hozzáadás" ></th>
+                </tr>
+            </thead>
+            <tbody>
+            <% for(movie of movies) { %>
+                <tr>
+                    <td class="title"><%= movie.title %></td>
+                    <td><%- movie.addedBy=="attilka"? '<span class="badge badge-primary">attilka</span>' : movie.addedBy == "csengő" ? '<span class="badge badge-danger">csengő</span>' : '-' %></td>
+                    <td>
+                        <a href="https://ncore.cc/torrents.php?mire=<%- encodeURIComponent(movie.title) %>&kivalasztott_tipus%5B%5D=xvid_hun&kivalasztott_tipus%5B%5D=xvid&kivalasztott_tipus%5B%5D=hd_hun&kivalasztott_tipus%5B%5D=hd&tipus=kivalasztottak_kozott" target="_blank"><img src="/img/data-transfer-download.svg" alt="download" data-tooltip="tooltip" title="Keresés nCore-on"></a> 
+                        <img class="watch" src="/img/check.svg" alt="check" data-tooltip="tooltip" title="Megnézve"> 
+                        <img src="/img/x.svg" alt="x" class="delete" data-tooltip="tooltip" title="Törlés"> 
+                    </td>
+                </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
+
+<!-- Modal -->
+<div class="modal fade" id="addMovieModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Hozzáadás</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group row">
+                        <label for="title" class="col-sm-2 col-form-label">Cím</label>
+                        <div class="col-sm-10">     
+                            <input type="text" class="form-control mb-2"  id="title">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                            <label for="addedBy" class="col-sm-2 col-form-label">Hozzáadta</label>
+                            <div class="col-sm-10">     
+                                <select id="addedBy" class="form-control" required>
+                                    <option value="">-</option>
+                                    <option value="attilka">attilka</option>
+                                    <option value="csengő">csengő</option>
+                                </select>
+                            </div>
+                        </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Mégse</button>
+              <button type="button" class="btn btn-dark" id="save" data-dismiss="modal">nyomjad</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Sorsolás</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <h6 id="result"></h6>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Mégse</button>
+              <button type="button" class="btn btn-dark" id="watch" data-dismiss="modal">megnéz</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <script>
+        $('[data-tooltip="tooltip"]').tooltip();
+        $("#save").click(()=>{
+            let data = {title : $("#title").val()};
+            let addedBy = $("#addedBy").val();
+            if(addedBy != "") data.addedBy = addedBy;
+            $.ajax({
+                method : "POST",
+                url : "/movie",
+                data,
+                success : (movie) => {
+                    $("tbody").append(`<tr>
+                        <td class="title">${movie.title}</td>
+                        <td>${movie.addedBy=="attilka"? '<span class="badge badge-primary">attilka</span>' : movie.addedBy == "csengő" ? '<span class="badge badge-danger">csengő</span>' : '-'}</td>
+                        <td>
+                            <a href="https://ncore.cc/torrents.php?mire=${encodeURIComponent(movie.title)}&kivalasztott_tipus%5B%5D=xvid_hun&kivalasztott_tipus%5B%5D=xvid&kivalasztott_tipus%5B%5D=hd_hun&kivalasztott_tipus%5B%5D=hd&tipus=kivalasztottak_kozott" target="_blank"><img src="/img/data-transfer-download.svg" alt="download" data-tooltip="tooltip" title="Keresés nCore-on"></a> 
+                            <img class="watch" src="/img/check.svg" alt="check" data-tooltip="tooltip" title="Megnézve"> 
+                            <img src="/img/x.svg" alt="x" class="delete" data-tooltip="tooltip" title="Törlés">
+                        </td></tr>`);
+                    $("tr:last .delete").click(deleteHandler);
+                    $("tr:last .watch").click(watchHandler);
+                    $('tr:last [data-tooltip="tooltip"]').tooltip();
+                    refreshInfo();
+                }
+            })
+        })
+
+        $(".delete").click(deleteHandler);
+        $("#random").click(()=>{$("#result").text(selectRandom());});
+        $(".watch").click(watchHandler);
+        $("#watch").click(()=>{
+            let title = $("#result").text();
+            watch(title);
+        });
+
+        function deleteHandler(){
+            $(this).tooltip('dispose');
+            let row = $(this).parents("tr");
+            let title = row.find(".title").text();
+            $.ajax({
+                method : "DELETE",
+                url : "/movie",
+                data : {
+                    title
+                },
+                success : (data) => {row.remove();refreshInfo();}
+            })
+        }
+
+        function watchHandler(){
+            let row = $(this).parents("tr");
+            let title = row.find(".title").text();
+            watch(title);
+        }
+
+        function selectRandom(){
+            let movies = $("tbody tr td:first-child").toArray();
+            movies = movies.map(x => x.innerText);
+            return movies[Math.floor(Math.random() * movies.length)]
+        }
+
+        function watch(title){
+            $.ajax({
+                method : "POST",
+                url : "/watch",
+                data : {
+                    title
+                },
+                success : (data) => {
+                    $("tbody tr td:first-child").each(function(){
+                        if($(this).text() == title)
+                            $(this).parent("tr").remove();
+                    });
+                    refreshInfo();
+                }
+            });
+        }
+
+        function countAddedBy(name, list){
+            let l = list?list:getList();
+            return l.reduce((acc, curr) => acc + (curr.addedBy == name ? 1 : 0), 0);
+        }
+
+        function getList(){
+            return $("tbody tr").map(function(){
+                let tds = $(this).children();
+                return {title: tds[0].innerText, addedBy: tds[1].innerText};
+            }).toArray();
+        }
+
+        function refreshInfo(){
+            $("#info").tooltip('dispose');
+            let list = getList();
+            let attilka = countAddedBy("attilka", list);
+            let csengo = countAddedBy("csengő", list);
+            let other = list.length - attilka - csengo;
+            $("#info").attr('title','attilka : '+attilka+'<br>csengő : '+csengo+'<br>senki : '+other).tooltip();
+        }
+
+        refreshInfo();
+
+
+    </script>
+</body>
+</html>

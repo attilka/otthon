@@ -1,0 +1,34 @@
+table thead img{
+    height: 1em;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+table img:hover{
+    height: 1.1em;
+}
+
+#info, #info:hover{
+    height: 1em;
+}
+
+table tbody img{
+    height: 0.6em;
+}
+
+table tbody img:hover{
+    height: 0.7em;
+}
+
+#actions{
+    min-width: 6em;
+    text-align: center;
+}
+
+#addedBy{
+    min-width: 9em;
+}
+
+table td:last-child{
+    text-align: center;
+}
